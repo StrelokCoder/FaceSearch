@@ -1,0 +1,6 @@
+insightface
+onnxruntime
+selenium
+requests
+tqdm
+colorama

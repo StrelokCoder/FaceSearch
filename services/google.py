@@ -44,8 +44,6 @@ class Google:
     def InitTextImageSearch(self, driver, image_text):
         driver.get(self.SITE_LINK)
 
-        # driver = webutils.GetWebdriver()
-
         text_input = webutils.LoopUntilElementFoundByClassName(driver, self.TEXT_INPUT_CLASS)
         if text_input is None:
             return False
@@ -57,8 +55,7 @@ class Google:
             return False
         driver.execute_script("arguments[0].click();", search_button)
 
-        # Wait to just fully load site, it's much faster than yandex
-        sleep(2.5)
+        sleep(2)
 
         return True
 
@@ -99,7 +96,7 @@ class Google:
 
         images_info = []
 
-        # array of (current_image, max_image, clicked_image, fail_safe_timer)
+        # [(current_image, max_image, clicked_image, fail_safe_timer)]
         layout_infos = self.GetLayoutInfos(driver)
 
         while True:

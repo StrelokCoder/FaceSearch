@@ -17,7 +17,7 @@ def GetDownloadProcessesCount():
     config.read("config.ini")
     processes_count = config.get("main", "download_processes_count")
 
-    if processes_count == "cpu":
+    if processes_count.lower() == "cpu":
         return os.cpu_count()
     else:
         return int(processes_count)
@@ -28,9 +28,9 @@ def IsHeadlessMode():
     config.read("config.ini")
     headless = config.get("main", "headless_mode")
 
-    if headless == "true":
+    if headless.lower() == "true":
         return True
-    elif headless == "false":
+    elif headless.lower() == "false":
         return False
 
 
@@ -40,7 +40,19 @@ def GetSimilarityThreshold():
     return float(config.get("main", "similarity_threshold"))
 
 
-def GetGeckodriverPath():
+def GetGeckoDriverPath():
     config = ConfigParser()
     config.read("config.ini")
-    return float(config.get("main", "similarity_threshold"))
+    return float(config.get("main", "geckodriver_path"))
+
+
+def GetChromeDriverPath():
+    config = ConfigParser()
+    config.read("config.ini")
+    return float(config.get("main", "chromedriver_path"))
+
+
+def GetCurrentWebBrowser():
+    config = ConfigParser()
+    config.read("config.ini")
+    return float(config.get("main", "current_browser")).lower()

@@ -17,12 +17,23 @@ from time import sleep
 
 
 def GetWebdriver():
-    options = webdriver.FirefoxOptions()
-    if config.IsHeadlessMode() == True:
-        options.add_argument("-headless")
-    service = webdriver.FirefoxService("/snap/bin/geckodriver")
-    driver = webdriver.Firefox(options=options, service=service)
-    driver.maximize_window()
+    browser = config.GetCurrentWebBrowser()
+
+    if browser == "firefox":
+        options = webdriver.FirefoxOptions()
+        if config.IsHeadlessMode() == True:
+            options.add_argument("--headless")
+        service = webdriver.FirefoxService(config.GetGeckoDriverPath())
+        driver = webdriver.Firefox(options=options, service=service)
+        driver.maximize_window()
+    elif browser == "chrome":
+        options = webdriver.ChromeOptions()
+        if config.IsHeadlessMode() == True:
+            options.add_argument("--headless")
+        service = webdriver.ChromeService(config.GetChromeDriverPath())
+        driver = webdriver.Chrome(options=options, service=service)
+        driver.maximize_window()
+
     return driver
 
 

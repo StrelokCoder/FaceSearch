@@ -33,8 +33,8 @@ def IsArrayEmpty(array, empty_message, not_empty_message):
         return False
 
 
-def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download_matches, compare_database):
-    compare_faces = download_matches or compare_database
+def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download_matches, check_database):
+    compare_faces = download_matches or check_database
 
     photos_path = []
     for photo_name in os.listdir(Directories.Photos):
@@ -44,7 +44,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
     if IsArrayEmpty(photos_path, "There are no photos", "Encoding faces from {0} photos".format(len(photos_path))):
         return
 
-    # (photo_path, encoding, [[urls]])
+    # [(photo_path, encoding, [[urls]])]
     photos_info = []
     for photo_path in photos_path:
         if not compare_faces:
@@ -84,7 +84,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
             if webutils.DownloadUrls(photo_info[2], "No urls for photo: {0}".format(photo_info[0])) == False:
                 continue
 
-            # (image_path, image_url, [encoding])
+            # [(image_path, image_url, [encoding])]
             encodings_info = frutils.BatchFaceEncodings(face_analysis)
 
             if download_matches:
@@ -98,13 +98,13 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
 
         driver.quit()
 
-    if compare_database:
+    if check_database:
         # [(image_url, [encodings])]
         database = frutils.LoadDataBase()
 
         for photo_info in photos_info:
             console.SubTask("Reverse searching photo: {0} in database".format(photo_info[0]))
-            # (url, similarity)
+            # [(url, similarity)]
             matches = []
             for image_info in database:
                 best_similarity = 0
@@ -155,7 +155,6 @@ def TextSearchPhotos(face_analysis, database_sha256):
             if webutils.DownloadUrls(array_urls_array, "No urls for pharse: {0}".format(line)) == False:
                 continue
 
-            # (image_path, image_url, [encoding])
             frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
             utils.ClearDownloadsTemporary()
@@ -198,7 +197,6 @@ def FacebookSearchPhotos(face_analysis, database_sha256):
             if webutils.DownloadUrls(array_urls_array, "No urls for facebook profile: {0}".format(line)) == False:
                 continue
 
-        # (image_path, image_url, [encoding])
         frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
         utils.ClearDownloadsTemporary()
@@ -241,7 +239,6 @@ def InstagramSearchPhotos(face_analysis, database_sha256):
             if webutils.DownloadUrls(array_urls_array, "No urls for instagram profile: {0}".format(line)) == False:
                 continue
 
-            # (image_path, image_url, [encoding])
             frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
             utils.ClearDownloadsTemporary()
@@ -258,31 +255,30 @@ def PrintAllPossibleOptions():
     console.Task("All possible program arguments")
     console.SubTask("se - Save encodings, program will use photos you put inside '{0}' to reverse search those photos and save all images with faces as encodings inside database, after being reverse searched photo will be put inside this folder '{1}'.".format(Directories.Photos, Directories.PhotosEncoded))
     console.SubTask("dm - Download matches, program will use photos you put inside '{0}' to reverse search imagee and save all of them at '{1}', that have at least one face matching face on photo, that was used to reverse search.".format(Directories.Photos, Directories.DownloadsMatches))
-    console.SubTask("cd - Comapre database, photos you put inside '{0}' will have their face encoded and than compared with database, images that have at least one face matching face on image will be downloaded at '{1}' in new folder named after photo's name it was comparing database with.".format(Directories.Photos, Directories.DownloadsEncodings))
+    console.SubTask("cd - Check database, photos you put inside '{0}' will have their face encoded and than checked inside database, images that have at least one face matching face on image will be downloaded at '{1}' in new folder named after photo's name it was comparing database with.".format(Directories.Photos, Directories.DownloadsEncodings))
     console.SubTask("sph - Search phrases, program will search phrases you put inside '{0}' and saved encodings of photo's faces inside database.".format(Directories.SearchPhrases))
     console.SubTask("spr - Search profiles, program will search profiles, that you saved inside '{0}', '{1}' for photos with faces to save encodings of those faces inside database.".format(Directories.FacebookProfiles, Directories.InstagramProfiles))
     console.SubTask("finishexit - Finish exit - program will quit break program loop after it is finished processing arguments you put.")
     console.SubTask("q - Quit, program will leave instantly")
     console.NewLine()
-    return
 
 
 def main():
-    # Reset console colors everytime we print something
+    # Resets console colors everytime we print something
     colorama.init(autoreset=True)
     CreateDirectories()
 
-    # Load it so we won't get spammed by messages, also it will make program run a little faster
+    # Load face recognition models
     face_analysis = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
     face_analysis.prepare(ctx_id=0, det_size=(640, 640))
 
-    # Load database, maybe in future I will optimise it
+    # Load database, only download_matches and check_database
     database_sha256 = frutils.LoadDatabaseSHA256()
 
     while True:
         save_encodings = False
         download_matches = False
-        compare_database = False
+        check_database = False
         search_phrases = False
         search_profiles = False
         finish_exit = False
@@ -298,7 +294,7 @@ def main():
             elif argument == "dm":
                 download_matches = True
             elif argument == "cd":
-                compare_database = True
+                check_database = True
             elif argument == "sph":
                 search_phrases = True
             elif argument == "spr":
@@ -318,8 +314,8 @@ def main():
         if search_phrases:
             TextSearchPhotos(face_analysis, database_sha256)
 
-        if save_encodings == True or download_matches == True or compare_database == True:
-            ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download_matches, compare_database)
+        if save_encodings == True or download_matches == True or check_database == True:
+            ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download_matches, check_database)
 
         if finish_exit == True:
             break

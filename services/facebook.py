@@ -29,7 +29,7 @@ class Facebook:
     def Init(self, driver):
         driver.get(self.SITE_LINK)
 
-        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS)
+        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS, 10)
         if cookies_decline is None:
             return False
         cookies_decline.click()
@@ -81,7 +81,7 @@ class Facebook:
                 checks_for_loaded += 1
                 sleep(0.1)
 
-            # Just an extra time to wait(for me facebook has an issue with loading images as well), cause sometimes it takes time before new images load
+            # Just an extra time to wait, cause sometimes it takes time before new images load
             sleep(3)
 
             if current_highest_image == previous_highest_image:
@@ -101,7 +101,7 @@ class Facebook:
                 driver.execute_script("window.open(" ");")
                 sleep(0.05)
 
-                # Switch to window and go to link
+                # Switch to window and go to the link
                 driver.switch_to.window(driver.window_handles[len(driver.window_handles) - 1])
                 driver.get(images_src_sites[previous_highest_image])
                 previous_highest_image += 1
@@ -116,7 +116,7 @@ class Facebook:
                 driver.close()
             driver.switch_to.window(driver.window_handles[0])
 
-            # Scroll down so more images will get loaded and wait for them to load
+            # Scroll down so more images will get loaded
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             loops += 1
 

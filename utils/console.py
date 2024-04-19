@@ -7,7 +7,10 @@ from colorama import Fore, Style
 
 
 def Clear():
-    os.system("clear")
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
 
 
 def Task(text):

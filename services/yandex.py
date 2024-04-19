@@ -52,24 +52,24 @@ class Yandex:
         photo_input = webutils.LoopUntilElementFoundByClassName(driver, self.PHOTO_INPUT_CLASS)
         if photo_input is None:
             return False
+        
         # Sometimes doesn't work when we don't wait
         sleep(0.25)
         photo_input.send_keys(photo_path)
 
-        # This element is somewhat buggy
-        similar_images = webutils.LoopUntilElementFoundByClassName(driver, self.SIMILAR_IMAGES_BUTTON, 15)
+        similar_images = webutils.LoopUntilElementFoundByClassName(driver, self.SIMILAR_IMAGES_BUTTON, 10)
         if similar_images is None:
             photo_input.send_keys(photo_path)
-            similar_images = webutils.LoopUntilElementFoundByClassName(driver, self.SIMILAR_IMAGES_BUTTON, 15)
+            similar_images = webutils.LoopUntilElementFoundByClassName(driver, self.SIMILAR_IMAGES_BUTTON, 10)
             if similar_images is None:
                 return False
         driver.execute_script("arguments[0].click();", similar_images)
 
-        if not webutils.LoopUntilElementNotFoundByClassName(driver, self.SIMILAR_IMAGES_BUTTON, 15):
+        if not webutils.LoopUntilElementNotFoundByClassName(driver, self.SIMILAR_IMAGES_BUTTON):
             return False
 
         # Wait to fully load site
-        sleep(2)
+        sleep(5)
 
         return True
 
@@ -102,7 +102,7 @@ class Yandex:
             driver.execute_script("window.open(" ");")
             driver.switch_to.window(driver.window_handles[i])
             driver.get(current_url)
-            # In older version of yandex image search there was bug(?) where layout object switch between searches
+            # In older version of yandex reverse image search there was bug(?) where site layout was diffrent when you first reverse searched image and than start opening new windows with first window urls(first window is row and every next windows is column and reverse)
             if i == 1 and is_layout_column != self.IsLayoutColumn(driver):
                 driver.close()
                 driver.switch_to.window(driver.window_handles[0])
@@ -156,7 +156,6 @@ class Yandex:
                                 driver.execute_script("arguments[0].click();", driver.find_element(By.CLASS_NAME, self.CLOSE_BETTER_QUALITY_IMAGE_CLASS))
                                 continue
                             elif webutils.DoesElementExistClassName(driver, self.BETTER_QUALITY_IMAGE_ERROR_CLASS):
-                                # images_info.append(driver.find_element(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SRC_CLASS).get_attribute("src"))
                                 layout_infos[i] = self.SetLayoutInfo(layout_infos[i][0] + 1, layout_infos[i][1], False, 0)
                                 driver.execute_script("arguments[0].click();", driver.find_element(By.CLASS_NAME, self.CLOSE_BETTER_QUALITY_IMAGE_CLASS))
                                 continue

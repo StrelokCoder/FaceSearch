@@ -43,16 +43,16 @@ def GetSimilarityThreshold():
 def GetGeckoDriverPath():
     config = ConfigParser()
     config.read("config.ini")
-    return float(config.get("main", "geckodriver_path"))
+    return config.get("main", "geckodriver_path")
 
 
 def GetChromeDriverPath():
     config = ConfigParser()
     config.read("config.ini")
-    return float(config.get("main", "chromedriver_path"))
+    return config.get("main", "chromedriver_path")
 
 
 def GetCurrentWebBrowser():
     config = ConfigParser()
     config.read("config.ini")
-    return float(config.get("main", "current_browser")).lower()
+    return config.get("main", "current_browser").lower()

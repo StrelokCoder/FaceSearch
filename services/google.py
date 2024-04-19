@@ -93,11 +93,11 @@ class Google:
         return [current_image, max_image, clicked_image, fail_safe_timer]
 
     def TextImagesSearch(self, driver, image_text):
-        images_info = []
-
         if not self.InitTextImageSearch(driver, image_text):
             console.SubError("Failed to init reverse image search at yandex")
-            return images_info
+            raise Exception()
+
+        images_info = []
 
         # array of (current_image, max_image, clicked_image, fail_safe_timer)
         layout_infos = self.GetLayoutInfos(driver)

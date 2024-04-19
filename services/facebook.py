@@ -55,13 +55,11 @@ class Facebook:
         return True
 
     def ProfileImagesSearch(self, driver, profile_name):
-        images_info = []
-
         if not self.InitProfileImagesSearch(driver, profile_name, False):
             console.SubError("Failed to init profile search at facebook")
-            return images_info
+            raise Exception()
 
-        # driver = webutils.GetWebdriver()
+        images_info = []
 
         loops = 0
         previous_highest_image = 0

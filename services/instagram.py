@@ -61,11 +61,11 @@ class Instagram:
         return True
 
     def ProfileImagesSearch(self, driver, profile_name):
-        images_info = []
-
         if not self.InitProfileImagesSearch(driver, profile_name):
             console.SubError("Failed to init profile search at instagram")
-            return images_info
+            raise Exception()
+
+        images_info = []
 
         # driver = webutils.GetWebdriver()
 

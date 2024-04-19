@@ -124,11 +124,11 @@ class Yandex:
         return layout_infos
 
     def ReverseImagesSearch(self, driver, photo_path):
-        images_info = []
-
         if not self.InitReverseImageSearch(driver, photo_path):
             console.SubError("Failed to init reverse image search at yandex")
-            return images_info
+            raise Exception()
+
+        images_info = []
 
         # array of (current_image, max_image, clicked_image, fail_safe_timer)
         layout_infos = self.GetLayoutInfos(driver)

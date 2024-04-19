@@ -135,35 +135,35 @@ def TextSearchPhotos(face_analysis, database_sha256):
     google = Google()
     google_up_to_date = google.Init(driver)
 
-    web_search_crash = []
+    if google_up_to_date:
+        web_search_crash = []
 
-    for line in lines:
-        console.SubTask("Searching for pharse: {0}".format(line))
+        for line in lines:
+            console.SubTask("Searching for pharse: {0}".format(line))
 
-        # [[urls]]
-        array_urls_array = []
+            # [[urls]]
+            array_urls_array = []
 
-        try:
-            if google_up_to_date:
+            try:
                 array_urls_array.append(google.TextImagesSearch(driver, line))
-        except:
-            web_search_crash.append(line)
-            webutils.WebDriverCloseAllExtraTabs(driver)
-            console.SubError("Exception while web searching\n")
-            traceback.print_exc()
+            except:
+                web_search_crash.append(line)
+                webutils.WebDriverCloseAllExtraTabs(driver)
+                console.SubError("Exception while web searching\n")
+                traceback.print_exc()
 
-        if webutils.DownloadUrls(array_urls_array, "No urls for pharse: {0}".format(line)) == False:
-            continue
+            if webutils.DownloadUrls(array_urls_array, "No urls for pharse: {0}".format(line)) == False:
+                continue
 
-        # (image_path, image_url, [encoding])
-        frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
+            # (image_path, image_url, [encoding])
+            frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
-        utils.ClearDownloadsTemporary()
+            utils.ClearDownloadsTemporary()
 
-    os.remove(Directories.SearchPhrases)
-    with open(Directories.SearchPhrases, "w") as file:
-        for saved_line in web_search_crash:
-            file.write(saved_line + "\n")
+        os.remove(Directories.SearchPhrases)
+        with open(Directories.SearchPhrases, "w") as file:
+            for saved_line in web_search_crash:
+                file.write(saved_line + "\n")
 
     driver.quit()
 
@@ -178,35 +178,35 @@ def FacebookSearchPhotos(face_analysis, database_sha256):
     facebook = Facebook()
     facebook_up_to_date = facebook.Init(driver)
 
-    web_search_crash = []
+    if facebook_up_to_date:
+        web_search_crash = []
 
-    for line in lines:
-        console.SubTask("Searching for facebook profile: {0}".format(line))
+        for line in lines:
+            console.SubTask("Searching for facebook profile: {0}".format(line))
 
-        # [[urls]]
-        array_urls_array = []
+            # [[urls]]
+            array_urls_array = []
 
-        try:
-            if facebook_up_to_date:
+            try:
                 array_urls_array.append(facebook.ProfileImagesSearch(driver, line))
-        except:
-            web_search_crash.append(line)
-            webutils.WebDriverCloseAllExtraTabs(driver)
-            console.SubError("Exception while web searching\n")
-            traceback.print_exc()
+            except:
+                web_search_crash.append(line)
+                webutils.WebDriverCloseAllExtraTabs(driver)
+                console.SubError("Exception while web searching\n")
+                traceback.print_exc()
 
-        if webutils.DownloadUrls(array_urls_array, "No urls for facebook profile: {0}".format(line)) == False:
-            continue
+            if webutils.DownloadUrls(array_urls_array, "No urls for facebook profile: {0}".format(line)) == False:
+                continue
 
         # (image_path, image_url, [encoding])
         frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
         utils.ClearDownloadsTemporary()
 
-    os.remove(Directories.FacebookProfiles)
-    with open(Directories.FacebookProfiles, "w") as file:
-        for saved_line in web_search_crash:
-            file.write(saved_line + "\n")
+        os.remove(Directories.FacebookProfiles)
+        with open(Directories.FacebookProfiles, "w") as file:
+            for saved_line in web_search_crash:
+                file.write(saved_line + "\n")
 
     driver.quit()
 
@@ -221,35 +221,35 @@ def InstagramSearchPhotos(face_analysis, database_sha256):
     instagram = Instagram()
     instagram_up_to_date = instagram.Init(driver)
 
-    web_search_crash = []
+    if instagram_up_to_date:
+        web_search_crash = []
 
-    for line in lines:
-        console.SubTask("Searching for instagram profile: {0}".format(line))
+        for line in lines:
+            console.SubTask("Searching for instagram profile: {0}".format(line))
 
-        # [[urls]]
-        array_urls_array = []
+            # [[urls]]
+            array_urls_array = []
 
-        try:
-            if instagram_up_to_date:
+            try:
                 array_urls_array.append(instagram.ProfileImagesSearch(driver, line))
-        except:
-            web_search_crash.append(line)
-            webutils.WebDriverCloseAllExtraTabs(driver)
-            console.SubError("Exception while web searching\n")
-            traceback.print_exc()
+            except:
+                web_search_crash.append(line)
+                webutils.WebDriverCloseAllExtraTabs(driver)
+                console.SubError("Exception while web searching\n")
+                traceback.print_exc()
 
-        if webutils.DownloadUrls(array_urls_array, "No urls for instagram profile: {0}".format(line)) == False:
-            continue
+            if webutils.DownloadUrls(array_urls_array, "No urls for instagram profile: {0}".format(line)) == False:
+                continue
 
-        # (image_path, image_url, [encoding])
-        frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
+            # (image_path, image_url, [encoding])
+            frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
-        utils.ClearDownloadsTemporary()
+            utils.ClearDownloadsTemporary()
 
-    # os.remove(Directories.InstagramProfiles)
-    # with open(Directories.InstagramProfiles, "w") as file:
-    #    for saved_line in web_search_crash:
-    #        file.write(saved_line + "\n")
+        # os.remove(Directories.InstagramProfiles)
+        # with open(Directories.InstagramProfiles, "w") as file:
+        #    for saved_line in web_search_crash:
+        #        file.write(saved_line + "\n")
 
     driver.quit()
 
@@ -276,12 +276,8 @@ def main():
     face_analysis = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
     face_analysis.prepare(ctx_id=0, det_size=(640, 640))
 
-    # Load database, maybe in future I will optimise it like below
+    # Load database, maybe in future I will optimise it
     database_sha256 = frutils.LoadDatabaseSHA256()
-
-    # database_sha256 = []
-    # if search_profiles == True or search_phrases == True or save_encodings == True:
-    #     database_sha256 = frutils.LoadDatabaseSHA256()
 
     while True:
         save_encodings = False

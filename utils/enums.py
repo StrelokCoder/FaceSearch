@@ -16,12 +16,16 @@ class Directories:
     DownloadsMatches = "downloads/matches/"
     DownloadsEncodings = "downloads/encodings/"
     Encodings = "encodings/"
-    # Temporary
-    DownloadsTemporary = "/tmp/downloads/"
     # Search phrases
     SearchPhrases = "search_phrases.txt"
     FacebookProfiles = "facebook_profiles.txt"
     InstagramProfiles = "instagram_profiles.txt"
+
+    def GetDownloadsTemporary():
+        if os.name == "nt":
+            "tmp/downloads/"
+        else:
+            "/tmp/downloads/"
 
 
 def CreateDirectories():
@@ -33,7 +37,7 @@ def CreateDirectories():
     Path(Directories.DownloadsEncodings).mkdir(parents=False, exist_ok=True)
     Path(Directories.Encodings).mkdir(parents=False, exist_ok=True)
     # Temporary
-    Path(Directories.DownloadsTemporary).mkdir(parents=False, exist_ok=True)
+    Path(Directories.GetDownloadsTemporary()).mkdir(parents=False, exist_ok=True)
 
     if not os.path.isfile(Directories.SearchPhrases):
         utils.SaveFile(Directories.SearchPhrases, bytes())

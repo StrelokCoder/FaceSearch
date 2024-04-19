@@ -154,7 +154,7 @@ def BatchDownloadImages(urls):
             url = urls[end_idx]
             urls.pop(end_idx)
 
-            process = Process(target=DownloadImage, args=(url, Directories.DownloadsTemporary + utils.RandomString() + ".png"))
+            process = Process(target=DownloadImage, args=(url, Directories.GetDownloadsTemporary() + utils.RandomString() + ".png"))
             processes.append(process)
             process.start()
             threads_busy += 1

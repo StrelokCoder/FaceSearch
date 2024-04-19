@@ -1,3 +1,6 @@
+# FaceSearch
+Program allowing you to find more images of a person from single photo with him and making database of faces for future comparisons and downloads of images with face in case of face match.
+
 # Setup
 
 #### Download
@@ -21,7 +24,7 @@
 2. READ and type arguments to set which mode of the program you want to use
 3. You can also change some config.ini values, but please read description of them
 
-#### How to get facebook/instagram(not fully supported yet) profiles
+#### How to get facebook/instagram(not supported yet) profiles
 * "https://www.facebook.com/profile_name" <- put profile_name inside facebook_profiles.txt, single profile per line
 * "https://www.instagram.com/profile_name" <- put profile_name inside instagram_profiles.txt, single profile per line
 

@@ -61,5 +61,5 @@ def GetImageMetadata(image_path, metadata_key):
 
 
 def ClearDownloadsTemporary():
-    for image_name in os.listdir(Directories.DownloadsTemporary):
-        os.remove(Directories.DownloadsTemporary + image_name)
+    for image_name in os.listdir(Directories.GetDownloadsTemporary()):
+        os.remove(Directories.GetDownloadsTemporary() + image_name)

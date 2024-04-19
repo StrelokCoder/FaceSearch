@@ -4,6 +4,7 @@
 import utils.facerecognition as frutils
 import utils.webutils as webutils
 import utils.console as console
+import utils.config as config
 import utils.utils as utils
 
 from utils.enums import Directories, CreateDirectories
@@ -32,8 +33,8 @@ def IsArrayEmpty(array, empty_message, not_empty_message):
         return False
 
 
-def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, compare_database, download_matches):
-    compare_faces = compare_database or download_matches
+def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download_matches, compare_database):
+    compare_faces = download_matches or compare_database
 
     photos_path = []
     for photo_name in os.listdir(Directories.Photos):
@@ -87,7 +88,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, compare_
             encodings_info = frutils.BatchFaceEncodings(face_analysis)
 
             if download_matches:
-                frutils.MoveMatchedPhotos(photo_info[1], encodings_info)
+                frutils.MoveMatchedPhotos(ntpath.basename(photo_info[0]), photo_info[1], encodings_info)
 
             if save_encodings:
                 frutils.SaveEncodings(encodings_info, database_sha256)
@@ -111,7 +112,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, compare_
 
                 for encoding in image_info[1]:
                     similarity = numpy.dot(encoding, photo_info[1])
-                    if similarity > 0.6 and similarity > best_similarity:
+                    if similarity > config.GetSimilarityThreshold() and similarity > best_similarity:
                         best_similarity = similarity
                         save = True
 
@@ -180,7 +181,7 @@ def FacebookSearchPhotos(face_analysis, database_sha256):
     web_search_crash = []
 
     for line in lines:
-        console.SubTask("Searching for pharse: {0}".format(line))
+        console.SubTask("Searching for facebook profile: {0}".format(line))
 
         # [[urls]]
         array_urls_array = []
@@ -223,7 +224,7 @@ def InstagramSearchPhotos(face_analysis, database_sha256):
     web_search_crash = []
 
     for line in lines:
-        console.SubTask("Searching for pharse: {0}".format(line))
+        console.SubTask("Searching for instagram profile: {0}".format(line))
 
         # [[urls]]
         array_urls_array = []
@@ -253,7 +254,20 @@ def InstagramSearchPhotos(face_analysis, database_sha256):
     driver.quit()
 
 
-def main(save_encodings, compare_database, download_matches, search_phrases, search_profiles):
+def PrintAllPossibleOptions():
+    console.Task("All possible program arguments")
+    console.SubTask("se - Save encodings, program will use photos you put inside '{0}' to reverse search those photos and save all images with faces as encodings inside database, after being reverse searched photo will be put inside this folder '{1}'.".format(Directories.Photos, Directories.PhotosEncoded))
+    console.SubTask("dm - Download matches, program will use photos you put inside '{0}' to reverse search imagee and save all of them at '{1}', that have at least one face matching face on photo, that was used to reverse search.".format(Directories.Photos, Directories.DownloadsMatches))
+    console.SubTask("cd - Comapre database, photos you put inside '{0}' will have their face encoded and than compared with database, images that have at least one face matching face on image will be downloaded at '{1}' in new folder named after photo's name it was comparing database with.".format(Directories.Photos, Directories.DownloadsEncodings))
+    console.SubTask("sph - Search phrases, program will search phrases you put inside '{0}' and saved encodings of photo's faces inside database.".format(Directories.SearchPhrases))
+    console.SubTask("spr - Search profiles, program will search profiles, that you saved inside '{0}', '{1}' for photos with faces to save encodings of those faces inside database.".format(Directories.FacebookProfiles, Directories.InstagramProfiles))
+    console.SubTask("finishexit - Finish exit - program will quit break program loop after it is finished processing arguments you put.")
+    console.SubTask("q - Quit, program will leave instantly")
+    console.NewLine()
+    return
+
+
+def main():
     # Reset console colors everytime we print something
     colorama.init(autoreset=True)
     CreateDirectories()
@@ -262,28 +276,60 @@ def main(save_encodings, compare_database, download_matches, search_phrases, sea
     face_analysis = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
     face_analysis.prepare(ctx_id=0, det_size=(640, 640))
 
-    database_sha256 = []
-    if search_profiles == True or search_phrases == True or save_encodings == True:
-        database_sha256 = frutils.LoadDatabaseSHA256()
+    # Load database, maybe in future I will optimise it like below
+    database_sha256 = frutils.LoadDatabaseSHA256()
 
-    if search_profiles:
-        FacebookSearchPhotos(face_analysis, database_sha256)
-        # InstagramSearchPhotos(face_analysis, database_sha256)
+    # database_sha256 = []
+    # if search_profiles == True or search_phrases == True or save_encodings == True:
+    #     database_sha256 = frutils.LoadDatabaseSHA256()
 
-    if search_phrases:
-        TextSearchPhotos(face_analysis, database_sha256)
+    while True:
+        save_encodings = False
+        download_matches = False
+        compare_database = False
+        search_phrases = False
+        search_profiles = False
+        finish_exit = False
 
-    if save_encodings == True or compare_database == True or download_matches == True:
-        ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, compare_database, download_matches)
+        PrintAllPossibleOptions()
+
+        arguments = input("Arguments: ").lower().split()
+
+        exit_loop = False
+        for argument in arguments:
+            if argument == "se":
+                save_encodings = True
+            elif argument == "dm":
+                download_matches = True
+            elif argument == "cd":
+                compare_database = True
+            elif argument == "sph":
+                search_phrases = True
+            elif argument == "spr":
+                search_profiles = True
+            elif argument == "finishexit":
+                finish_exit = True
+            elif argument == "q":
+                exit_loop = True
+
+        if exit_loop == True:
+            break
+
+        if search_profiles:
+            FacebookSearchPhotos(face_analysis, database_sha256)
+            # InstagramSearchPhotos(face_analysis, database_sha256)
+
+        if search_phrases:
+            TextSearchPhotos(face_analysis, database_sha256)
+
+        if save_encodings == True or download_matches == True or compare_database == True:
+            ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download_matches, compare_database)
+
+        if finish_exit == True:
+            break
 
     console.Task("Program finished working")
 
 
 if __name__ == "__main__":
-    save_encodings = False
-    compare_database = True
-    download_matches = False
-    search_phrases = False
-    search_profiles = False
-
-    main(save_encodings, compare_database, download_matches, search_phrases, search_profiles)
+    main()

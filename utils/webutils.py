@@ -2,13 +2,13 @@
 # 04.03.2024
 
 import utils.console as console
+import utils.config as config
 import utils.utils as utils
 
 from utils.enums import Directories
 
 import selenium.webdriver as webdriver
 import requests
-import os
 
 from selenium.webdriver.common.by import By
 from multiprocessing import Process
@@ -18,10 +18,10 @@ from time import sleep
 
 def GetWebdriver():
     options = webdriver.FirefoxOptions()
-    options.add_argument("-headless")
+    if config.IsHeadlessMode == True:
+        options.add_argument("-headless")
     service = webdriver.FirefoxService("/snap/bin/geckodriver")
     driver = webdriver.Firefox(options=options, service=service)
-    # driver.minimize_window()
     driver.maximize_window()
     return driver
 
@@ -138,7 +138,7 @@ def BatchDownloadImages(urls):
     processes = []
 
     while len(urls) != 0 or threads_busy != 0:
-        while len(urls) != 0 and threads_busy < os.cpu_count():
+        while len(urls) != 0 and threads_busy < config.GetDownloadProcessesCount():
             end_idx = len(urls) - 1
             url = urls[end_idx]
             urls.pop(end_idx)
@@ -180,9 +180,9 @@ def BatchDownloadMatchedImages(directory_name, matches):
     threads_busy = 0
     processes = []
 
-    downloaded_matches = 48
+    downloaded_matches = config.GetDatabaseDownloadCount()
     while (len(matches) != 0 and downloaded_matches > 0) or threads_busy != 0:
-        while len(matches) != 0 and downloaded_matches > 0 and threads_busy < os.cpu_count():
+        while len(matches) != 0 and downloaded_matches > 0 and threads_busy < config.GetDownloadProcessesCount():
             end_idx = len(matches) - 1
             url = matches[end_idx][0]
 

@@ -2,6 +2,7 @@
 # 04.03.2024
 
 import utils.console as console
+import utils.config as config
 import utils.utils as utils
 
 from utils.enums import Directories
@@ -12,6 +13,7 @@ import cv2
 import os
 
 from tqdm import tqdm as ProgressionBar
+from pathlib import Path
 
 
 # Modifies image by drawing detected faces on it
@@ -39,19 +41,22 @@ def DrawFacesInfo(faces, image_path, save_path):
 
 
 # Moves matched photo to matched photos folder
-def MoveMatchedPhotos(original_encoding, encodings_info):
+def MoveMatchedPhotos(directory_name, original_encoding, encodings_info):
+    directory_path = os.getcwd() + "/" + Directories.DownloadsMatches + directory_name + "/"
+    Path(directory_path).mkdir(parents=False, exist_ok=True)
+
     for encoding_info in encodings_info:
         best_similarity = 0
         save = False
 
         for encoding in encoding_info[2]:
             similarity = numpy.dot(encoding, original_encoding)
-            if similarity > 0.6 and similarity > best_similarity:
+            if similarity > config.GetSimilarityThreshold() and similarity > best_similarity:
                 best_similarity = similarity
                 save = True
 
         if save is True:
-            shutil.move(encoding_info[0], os.getcwd() + "/" + Directories.DownloadsMatches + "{:.10f}.png".format(best_similarity))
+            shutil.move(encoding_info[0], directory_path + "{:.10f}.png".format(best_similarity))
 
 
 def BatchFaceEncodings(face_analysis):

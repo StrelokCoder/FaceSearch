@@ -24,3 +24,7 @@ def Error(text):
 
 def SubError(text):
     print(Fore.RED + Style.BRIGHT + "    -> {0}".format(text))
+
+
+def NewLine():
+    print("\n")

@@ -1,7 +1,6 @@
 # instgram.py
 # 10.04.2024
 
-
 import utils.webutils as webutils
 import utils.console as console
 

@@ -18,7 +18,7 @@ from time import sleep
 
 def GetWebdriver():
     options = webdriver.FirefoxOptions()
-    if config.IsHeadlessMode == True:
+    if config.IsHeadlessMode() == True:
         options.add_argument("-headless")
     service = webdriver.FirefoxService("/snap/bin/geckodriver")
     driver = webdriver.Firefox(options=options, service=service)
@@ -180,7 +180,7 @@ def BatchDownloadMatchedImages(directory_name, matches):
     threads_busy = 0
     processes = []
 
-    downloaded_matches = config.GetDatabaseDownloadCount()
+    downloaded_matches = config.GetDatabaseDownloadLimit()
     while (len(matches) != 0 and downloaded_matches > 0) or threads_busy != 0:
         while len(matches) != 0 and downloaded_matches > 0 and threads_busy < config.GetDownloadProcessesCount():
             end_idx = len(matches) - 1

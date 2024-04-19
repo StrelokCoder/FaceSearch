@@ -25,4 +25,4 @@ In future windows and chromium support might be added(if someone helps me with t
 * "https://www.instagram.com/profile_name" <- put profile_name inside instagram_profiles.txt, single profile per line
 
 # VERY IMPORTANT INFO ABOUT LICENSE!!!
-Default models(buffalo_l), that are downloaded during installation aren't mine and they are subjected to this [license](https://github.com/deepinsight/insightface#License)
+Default models(buffalo_l), that are downloaded during installation aren't mine and in order to get info about their license [go here](https://github.com/deepinsight/insightface#License)

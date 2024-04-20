@@ -14,7 +14,7 @@ class Google:
     TEXT_SEARCH_WEB_PAGES_COUNT = 12
 
     # Cookies block any actions until we accept/decline them
-    DECLINE_COOKIES_CLASS = "W0wltc"
+    DECLINE_COOKIES_ID = "W0wltc"
 
     # Send text here and press button to start searching for it
     TEXT_INPUT_CLASS = "gLFyf"
@@ -33,7 +33,7 @@ class Google:
     def Init(self, driver):
         driver.get(self.SITE_LINK)
 
-        cookies_decline = webutils.LoopUntilElementFoundByID(driver, self.DECLINE_COOKIES_CLASS)
+        cookies_decline = webutils.LoopUntilElementFoundByID(driver, self.DECLINE_COOKIES_ID)
         if cookies_decline is None:
             return False
         driver.execute_script("arguments[0].click();", cookies_decline)
@@ -46,6 +46,11 @@ class Google:
 
     def InitTextImageSearch(self, driver, image_text):
         driver.get(self.SITE_LINK)
+
+        sleep(2)
+
+        if not webutils.LoopUntilElementNotFoundByID(driver, self.DECLINE_COOKIES_ID):
+            driver.execute_script("arguments[0].click();", driver.find_element(By.ID, self.DECLINE_COOKIES_ID))
 
         text_input = webutils.LoopUntilElementFoundByClassName(driver, self.TEXT_INPUT_CLASS)
         if text_input is None:

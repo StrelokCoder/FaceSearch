@@ -112,6 +112,17 @@ def LoopUntilElementFoundByID(parent, id, loop_time=5):
     return parent.find_element(By.ID, id)
 
 
+def LoopUntilElementNotFoundByID(parent, id, loop_time=5):
+    check = 0
+    while DoesElementExistByID(parent, id):
+        if check > loop_time:
+            console.SubError("Element by id: {0}, still exists".format(id))
+            return False
+        check += 0.1
+        sleep(0.1)
+    return True
+
+
 def DoesElementTextEqual(parent, attribute_name, attribute_text):
     return parent.get_attribute(attribute_name) == attribute_text
 

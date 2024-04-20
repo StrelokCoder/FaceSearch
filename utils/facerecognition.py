@@ -68,7 +68,6 @@ def BatchFaceEncodings(face_analysis):
         # Suppresses libpng warning: iCCP: known incorrect sRGB profile
         console.SuppressPrint()
         faces = face_analysis.get(cv2.imread(image_path))
-        console.RestorePrint()
 
         encodings = []
         for face in faces:
@@ -76,6 +75,7 @@ def BatchFaceEncodings(face_analysis):
 
         if len(encodings) != 0:
             encodings_info.append((image_path, utils.GetImageMetadata(image_path, "url"), encodings))
+        console.RestorePrint()
 
     console.SubTask("Faces found and encoded on {0} images, from total of {1} images".format(len(encodings_info), len(os.listdir(Directories.GetDownloadsTemporary()))))
 

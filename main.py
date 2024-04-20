@@ -53,7 +53,6 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
             # Suppresses libpng warning: iCCP: known incorrect sRGB profile
             console.SuppressPrint()
             faces = face_analysis.get(cv2.imread(photo_path))
-            console.RestorePrint()
 
             if len(faces) == 1:
                 photos_info.append((photo_path, numpy.array(faces[0].normed_embedding, dtype=numpy.float32), []))
@@ -61,6 +60,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
                 console.SubError("Couldn't find any faces on photo: {0}".format(photo_path))
             else:
                 console.SubError("There is more than one face on photo: {0}, faces count: {1}".format(photo_path, len(faces)))
+            console.RestorePrint()
 
     if len(photos_info) == 0:
         console.Error("Couldn't encode any face on any image, aborting")

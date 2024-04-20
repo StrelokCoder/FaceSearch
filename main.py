@@ -50,8 +50,6 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
         if not compare_faces:
             photos_info.append((photo_path, [], []))
         else:
-            # Suppresses libpng warning: iCCP: known incorrect sRGB profile
-            console.SuppressPrint()
             faces = face_analysis.get(cv2.imread(photo_path))
 
             if len(faces) == 1:
@@ -60,7 +58,6 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
                 console.SubError("Couldn't find any faces on photo: {0}".format(photo_path))
             else:
                 console.SubError("There is more than one face on photo: {0}, faces count: {1}".format(photo_path, len(faces)))
-            console.RestorePrint()
 
     if len(photos_info) == 0:
         console.Error("Couldn't encode any face on any image, aborting")
@@ -91,7 +88,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
             encodings_info = frutils.BatchFaceEncodings(face_analysis)
 
             if download_matches:
-                frutils.MoveMatchedPhotos(ntpath.basename(photo_info[0]), photo_info[1], encodings_info)
+                frutils.MoveMatchedImages(ntpath.basename(photo_info[0]), photo_info[1], encodings_info)
 
             if save_encodings:
                 frutils.SaveEncodings(encodings_info, database_sha256)
@@ -271,14 +268,14 @@ def main():
     colorama.init(autoreset=True)
     CreateDirectories()
 
-    # Suppresses messages about what models are loaded
+    # Suppresses messages about what models are loaded and with what provider
     console.SuppressPrint()
     # Load face recognition models
     face_analysis = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
     face_analysis.prepare(ctx_id=0, det_size=(640, 640))
     console.RestorePrint()
 
-    # Load database, only download_matches and check_database
+    # Load database_sha256(only download_matches and check_database don't use it), so we won't need to do this every single time we add something to database
     database_sha256 = frutils.LoadDatabaseSHA256()
 
     while True:

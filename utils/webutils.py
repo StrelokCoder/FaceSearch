@@ -68,55 +68,60 @@ def DoesElementExistByID(parent, id):
     return True
 
 
-def LoopUntilElementFoundByXPath(parent, xpath, loop_time=5):
+def LoopUntilElementFoundByXPath(parent, xpath, loop_time=5, print_error=True):
     check = 0
     while not DoesElementExistXPath(parent, xpath):
         if check > loop_time:
-            console.SubError("Couldn't find element with xpath: {0}".format(xpath))
+            if print_error == True:
+                console.SubError("Couldn't find element with xpath: {0}".format(xpath))
             return None
         check += 0.1
         sleep(0.1)
     return parent.find_element(By.XPATH, xpath)
 
 
-def LoopUntilElementFoundByClassName(parent, class_name, loop_time=5):
+def LoopUntilElementFoundByClassName(parent, class_name, loop_time=5, print_error=True):
     check = 0
     while not DoesElementExistClassName(parent, class_name):
         if check > loop_time:
-            console.SubError("Couldn't find element with class name: {0}".format(class_name))
+            if print_error == True:
+                console.SubError("Couldn't find element with class name: {0}".format(class_name))
             return None
         check += 0.1
         sleep(0.1)
     return parent.find_element(By.CLASS_NAME, class_name)
 
 
-def LoopUntilElementNotFoundByClassName(parent, class_name, loop_time=5):
+def LoopUntilElementNotFoundByClassName(parent, class_name, loop_time=5, print_error=True):
     check = 0
     while DoesElementExistClassName(parent, class_name):
         if check > loop_time:
-            console.SubError("Element by class name: {0}, still exists".format(class_name))
+            if print_error == True:
+                console.SubError("Element by class name: {0}, still exists".format(class_name))
             return False
         check += 0.1
         sleep(0.1)
     return True
 
 
-def LoopUntilElementFoundByID(parent, id, loop_time=5):
+def LoopUntilElementFoundByID(parent, id, loop_time=5, print_error=True):
     check = 0
     while not DoesElementExistByID(parent, id):
         if check > loop_time:
-            console.SubError("Couldn't find element with id: {0}".format(id))
+            if print_error == True:
+                console.SubError("Couldn't find element with id: {0}".format(id))
             return None
         check += 0.1
         sleep(0.1)
     return parent.find_element(By.ID, id)
 
 
-def LoopUntilElementNotFoundByID(parent, id, loop_time=5):
+def LoopUntilElementNotFoundByID(parent, id, loop_time=5, print_error=True):
     check = 0
     while DoesElementExistByID(parent, id):
         if check > loop_time:
-            console.SubError("Element by id: {0}, still exists".format(id))
+            if print_error == True:
+                console.SubError("Element by id: {0}, still exists".format(id))
             return False
         check += 0.1
         sleep(0.1)
@@ -127,11 +132,12 @@ def DoesElementTextEqual(parent, attribute_name, attribute_text):
     return parent.get_attribute(attribute_name) == attribute_text
 
 
-def LoopUntilElementAttributeIsEqualText(parent, attribute_name, attribute_text, loop_time=5):
+def LoopUntilElementAttributeIsEqualText(parent, attribute_name, attribute_text, loop_time=5, print_error=True):
     check = 0
     while not DoesElementTextEqual(parent, attribute_name, attribute_text):
         if check > loop_time:
-            console.SubError("Attribute with name: {0}, isn't equal to text: {1}".format(attribute_name, attribute_text))
+            if print_error == True:
+                console.SubError("Attribute with name: {0}, isn't equal to text: {1}".format(attribute_name, attribute_text))
             return False
         check += 0.1
         sleep(0.1)

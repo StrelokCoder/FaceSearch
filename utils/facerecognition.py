@@ -40,8 +40,8 @@ def DrawFacesInfo(faces, image_path, save_path):
     cv2.imwrite(save_path, img)
 
 
-# Moves matched photo to matched photos folder
-def MoveMatchedPhotos(directory_name, original_encoding, encodings_info):
+# Moves matched image to matched images folder
+def MoveMatchedImages(directory_name, original_encoding, encodings_info):
     directory_path = os.getcwd() + "/" + Directories.DownloadsMatches + directory_name + "/"
     Path(directory_path).mkdir(parents=False, exist_ok=True)
 
@@ -65,8 +65,6 @@ def BatchFaceEncodings(face_analysis):
     for image_name in ProgressionBar(os.listdir(Directories.GetDownloadsTemporary())):
         image_path = Directories.GetDownloadsTemporary() + image_name
 
-        # Suppresses libpng warning: iCCP: known incorrect sRGB profile
-        console.SuppressPrint()
         faces = face_analysis.get(cv2.imread(image_path))
 
         encodings = []
@@ -75,7 +73,6 @@ def BatchFaceEncodings(face_analysis):
 
         if len(encodings) != 0:
             encodings_info.append((image_path, utils.GetImageMetadata(image_path, "url"), encodings))
-        console.RestorePrint()
 
     console.SubTask("Faces found and encoded on {0} images, from total of {1} images".format(len(encodings_info), len(os.listdir(Directories.GetDownloadsTemporary()))))
 

@@ -36,7 +36,7 @@ def CreateDirectories():
     Path(Directories.DownloadsMatches).mkdir(parents=False, exist_ok=True)
     Path(Directories.DownloadsEncodings).mkdir(parents=False, exist_ok=True)
     Path(Directories.Encodings).mkdir(parents=False, exist_ok=True)
-    # Temporary
+    # Temporary(on windows permament)
     Path(Directories.GetDownloadsTemporary()).mkdir(parents=False, exist_ok=True)
 
     if not os.path.isfile(Directories.SearchPhrases):

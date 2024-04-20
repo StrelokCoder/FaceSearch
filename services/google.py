@@ -13,18 +13,18 @@ class Google:
 
     TEXT_SEARCH_WEB_PAGES_COUNT = 12
 
-    # Cookies block any actions until we accept/decline them
+    # Cookies block any actions on whole webpage
     DECLINE_COOKIES_ID = "W0wltc"
 
     # Send text here and press button to start searching for it
     TEXT_INPUT_CLASS = "gLFyf"
     SEARCH_TEXT_BUTTON_CLASS = "Tg7LZd"
 
-    # Thumbnail image container, you have to press button to get access to better quality image
+    # Thumbnail image container, you have to press it in order to get access to better quality image
     THUMBNAIL_IMAGE_SRC_CLASS = "YQ4gaf"
     THUMBNAIL_BUTTON_CLASS = "F0uyec"
 
-    # Zoom in image info
+    # Element which hold source to better quality image
     BETTER_QUALITY_IMAGE_SRC_CLASS = "sFlh5c.pT0Scc.iPVvYb"
 
     def __init__(self):
@@ -33,10 +33,9 @@ class Google:
     def Init(self, driver):
         driver.get(self.SITE_LINK)
 
-        cookies_decline = webutils.LoopUntilElementFoundByID(driver, self.DECLINE_COOKIES_ID)
-        if cookies_decline is None:
-            return False
-        driver.execute_script("arguments[0].click();", cookies_decline)
+        cookies_decline = webutils.LoopUntilElementFoundByID(driver, self.DECLINE_COOKIES_ID, 10, False)
+        if cookies_decline is not None:
+            driver.execute_script("arguments[0].click();", cookies_decline)
 
         # We have to wait, so cookies decline will get remembered
         sleep(5)

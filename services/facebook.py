@@ -13,13 +13,15 @@ class Facebook:
     SITE_LINK_ADD_PHOTOS_WITH = "/photos"
     SITE_LINK_ADD_PHOTOS_BY = "/photos_by"
 
-    # Cookies block whole webpage
+    # Cookies block doing anything on whole webpage
     DECLINE_COOKIES_CLASS = "_42ft._4jy0._al66._4jy3._4jy1.selected._51sy"
+    # Decline cookies while searching, when you declined cookies max 2 minutes before using profile search and than start searching it won't first appear during Init
+    DECLINE_COOKIES_WHILE_SEARCHING_XPATH = "/html/body/div[3]/div[1]/div/div[2]/div/div/div/div/div[2]/div/div[1]/div[2]"
 
-    # Appears every time you open profile on facebook
+    # Appears every time you open profile on facebook to ask you to log in
     CLOSE_LOG_TO_FACEBOOK_XPATH = "/html/body/div[1]/div/div[1]/div/div[5]/div/div/div[1]/div/div[2]/div/div/div/div[1]/div"
 
-    # This image will be hold on seperate site, cause some people have a lot of photos and it's just faster to open them in new page
+    # This image will be hold on seperate site, cause some people have a lot of photos and it's just faster to open them in new page and get download link from there
     BETTER_QUALITY_IMAGE_SITE_SRC_CLASS = "x1i10hfl.xjbqb8w.x1ejq31n.xd10rxx.x1sy0etr.x17r0tee.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x1ypdohk.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x16tdsg8.x1hl2dhg.xggy1nq.x1a2a7pz.x1heor9g.xt0b8zv.x1lliihq.x5yr21d.x1n2onr6.xh8yej3"
     BETTER_QUALITY_IMAGE_SRC_CLASS = "x85a59c.x193iq5w.x4fas0m.x19kjcj4"
 
@@ -29,12 +31,11 @@ class Facebook:
     def Init(self, driver):
         driver.get(self.SITE_LINK)
 
-        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS, 10)
-        if cookies_decline is None:
-            return False
-        cookies_decline.click()
+        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS, 10, False)
+        if cookies_decline is not None:
+            cookies_decline.click()
 
-        # We have to wait, so cookies decline will get remembered
+        # We have to wait, so cookies decline will get remembered by facebook
         sleep(5)
 
         console.SubTask("Successfully initialized facebook")
@@ -45,6 +46,11 @@ class Facebook:
             driver.get(self.SITE_LINK + profile_name + self.SITE_LINK_ADD_PHOTOS_WITH)
         else:
             driver.get(self.SITE_LINK + profile_name + self.SITE_LINK_ADD_PHOTOS_BY)
+
+        # Facebook do be remembering
+        sleep(1)
+        if webutils.DoesElementExistXPath(driver, self.DECLINE_COOKIES_WHILE_SEARCHING_XPATH):
+            driver.find_element(By.XPATH, self.DECLINE_COOKIES_WHILE_SEARCHING_XPATH).click()
 
         close_log_to_facebook = webutils.LoopUntilElementFoundByXPath(driver, self.CLOSE_LOG_TO_FACEBOOK_XPATH)
         if close_log_to_facebook is None:
@@ -82,7 +88,7 @@ class Facebook:
                 checks_for_loaded += 1
                 sleep(0.1)
 
-            # Just an extra time to wait, cause sometimes it takes time before new images load
+            # Just an extra time to wait, cause it takes time before new images load
             sleep(3)
 
             if current_highest_image == previous_highest_image:
@@ -91,12 +97,12 @@ class Facebook:
             previous = previous_highest_image
             images_preview_photos = driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SITE_SRC_CLASS)
 
-            # Get links to sites with image with better quality
+            # Get links to sites with better quality image
             while previous < current_highest_image:
                 images_src_sites.append(images_preview_photos[previous].get_attribute("href"))
                 previous += 1
 
-            # Open sites with better quality images
+            # Open sites with better quality image
             while previous_highest_image < current_highest_image:
                 # Open new window
                 driver.execute_script("window.open(" ");")

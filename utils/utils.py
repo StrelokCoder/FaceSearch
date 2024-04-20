@@ -39,6 +39,8 @@ def SaveImage(image_path, image_bytes, metadatas):
 
     try:
         image = Image.open(image_path)
+        # No more console spamming with warning "libpng warning: iCCP: known incorrect sRGB profile"
+        image.info.pop("icc_profile", None)
     except UnidentifiedImageError:
         os.remove(image_path)
         return
@@ -56,8 +58,9 @@ def SaveImage(image_path, image_bytes, metadatas):
 
 
 def GetImageMetadata(image_path, metadata_key):
-    image = Image.open(image_path)
-    return image.info[metadata_key]
+    with Image.open(image_path) as image:
+        ret = image.info[metadata_key]
+    return ret
 
 
 def ClearDownloadsTemporary():

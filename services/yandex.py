@@ -11,12 +11,12 @@ from time import sleep, time
 class Yandex:
     SITE_LINK = "https://yandex.com/images/?rpt=imageview"
 
-    # Cookies sometimes block similar images clicking
+    # Cookies sometimes block some elements from being clicked(they don't do it nowadays, cause I use javascript to click elements)
     DECLINE_COOKIES_CLASS = "gdpr-popup-v3-button.gdpr-popup-v3-button_id_mandatory"
 
     # Send here your photo path and it will be send to reverse search it
     PHOTO_INPUT_CLASS = "CbirCore-FileInput"
-    # Click button to show us similar images to send photo
+    # Click button to show us similar images to the one we send photo
     SIMILAR_IMAGES_BUTTON = "Button2.Button2_width_max.Button2_view_default.Button2_size_l.Button2_link.CbirSimilar-MoreButton"
 
     # Layouts to search
@@ -38,10 +38,9 @@ class Yandex:
     def Init(self, driver):
         driver.get(self.SITE_LINK)
 
-        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS)
-        if cookies_decline is None:
-            return False
-        cookies_decline.click()
+        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS, 10, False)
+        if cookies_decline is not None:
+            cookies_decline.click()
 
         # We have to wait, so cookies decline will get remembered
         sleep(5)
@@ -56,7 +55,7 @@ class Yandex:
         if photo_input is None:
             return False
 
-        # Sometimes doesn't work when we don't wait
+        # Sometimes it doesn't work when we don't wait
         sleep(0.25)
         photo_input.send_keys(photo_path)
 
@@ -105,7 +104,7 @@ class Yandex:
             driver.execute_script("window.open(" ");")
             driver.switch_to.window(driver.window_handles[i])
             driver.get(current_url)
-            # In older version of yandex reverse image search there was bug(?) where site layout was diffrent when you first reverse searched image and than start opening new windows with first window urls(first window is row and every next windows is column and reverse)
+            # In older version of yandex reverse image search there was bug(?) where window layout was diffrent when you first reverse searched image and than start opening new windows with first window urls(first window is row and every next windows is column or reverse)
             if i == 1 and is_layout_column != self.IsLayoutColumn(driver):
                 driver.close()
                 driver.switch_to.window(driver.window_handles[0])

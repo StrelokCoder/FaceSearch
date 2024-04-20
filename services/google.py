@@ -38,6 +38,9 @@ class Google:
             return False
         driver.execute_script("arguments[0].click();", cookies_decline)
 
+        # We have to wait, so cookies decline will get remembered
+        sleep(5)
+
         console.SubTask("Successfully initialized google")
         return True
 

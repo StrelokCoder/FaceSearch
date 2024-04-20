@@ -43,6 +43,9 @@ class Yandex:
             return False
         cookies_decline.click()
 
+        # We have to wait, so cookies decline will get remembered
+        sleep(5)
+
         console.SubTask("Successfully initialized yandex")
         return True
 
@@ -52,7 +55,7 @@ class Yandex:
         photo_input = webutils.LoopUntilElementFoundByClassName(driver, self.PHOTO_INPUT_CLASS)
         if photo_input is None:
             return False
-        
+
         # Sometimes doesn't work when we don't wait
         sleep(0.25)
         photo_input.send_keys(photo_path)

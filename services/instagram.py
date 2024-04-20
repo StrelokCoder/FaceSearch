@@ -43,7 +43,8 @@ class Instagram:
             return False
         cookies_decline.click()
 
-        sleep(2.5)
+        # We have to wait, so cookies decline will get remembered
+        sleep(5)
 
         console.SubTask("Successfully initialized instagram")
         return True

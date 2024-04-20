@@ -34,7 +34,8 @@ class Facebook:
             return False
         cookies_decline.click()
 
-        sleep(4)
+        # We have to wait, so cookies decline will get remembered
+        sleep(5)
 
         console.SubTask("Successfully initialized facebook")
         return True

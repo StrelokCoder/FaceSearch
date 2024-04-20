@@ -50,7 +50,10 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
         if not compare_faces:
             photos_info.append((photo_path, [], []))
         else:
+            # Suppresses libpng warning: iCCP: known incorrect sRGB profile
+            console.SuppressPrint()
             faces = face_analysis.get(cv2.imread(photo_path))
+            console.RestorePrint()
 
             if len(faces) == 1:
                 photos_info.append((photo_path, numpy.array(faces[0].normed_embedding, dtype=numpy.float32), []))
@@ -268,9 +271,12 @@ def main():
     colorama.init(autoreset=True)
     CreateDirectories()
 
+    # Suppresses messages about what models are loaded
+    console.SuppressPrint()
     # Load face recognition models
     face_analysis = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
     face_analysis.prepare(ctx_id=0, det_size=(640, 640))
+    console.RestorePrint()
 
     # Load database, only download_matches and check_database
     database_sha256 = frutils.LoadDatabaseSHA256()

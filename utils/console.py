@@ -1,6 +1,7 @@
 # console.py
 # 04.03.2024
 
+import sys
 import os
 
 from colorama import Fore, Style
@@ -31,3 +32,11 @@ def SubError(text):
 
 def NewLine():
     print("\n")
+
+
+def SuppressPrint():
+    sys.stdout = open(os.devnull, "w")
+
+
+def RestorePrint():
+    sys.stdout = sys.__stdout__

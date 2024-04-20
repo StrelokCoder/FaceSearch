@@ -64,7 +64,11 @@ def BatchFaceEncodings(face_analysis):
 
     for image_name in ProgressionBar(os.listdir(Directories.GetDownloadsTemporary())):
         image_path = Directories.GetDownloadsTemporary() + image_name
+
+        # Suppresses libpng warning: iCCP: known incorrect sRGB profile
+        console.SuppressPrint()
         faces = face_analysis.get(cv2.imread(image_path))
+        console.RestorePrint()
 
         encodings = []
         for face in faces:

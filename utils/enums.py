@@ -23,9 +23,9 @@ class Directories:
 
     def GetDownloadsTemporary():
         if os.name == "nt":
-            "tmp/downloads/"
+            return "tmp/downloads/"
         else:
-            "/tmp/downloads/"
+            return "/tmp/downloads/"
 
 
 def CreateDirectories():

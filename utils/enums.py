@@ -12,6 +12,7 @@ class Directories:
     # Permament
     Photos = "photos/"
     PhotosEncoded = "photos/encoded/"
+    PhotosMultiple = "photos/multiple_people/"
     Downloads = "downloads/"
     DownloadsMatches = "downloads/matches/"
     DownloadsEncodings = "downloads/encodings/"
@@ -32,6 +33,7 @@ def CreateDirectories():
     # Permament
     Path(Directories.Photos).mkdir(parents=False, exist_ok=True)
     Path(Directories.PhotosEncoded).mkdir(parents=False, exist_ok=True)
+    Path(Directories.PhotosMultiple).mkdir(parents=False, exist_ok=True)
     Path(Directories.Downloads).mkdir(parents=False, exist_ok=True)
     Path(Directories.DownloadsMatches).mkdir(parents=False, exist_ok=True)
     Path(Directories.DownloadsEncodings).mkdir(parents=False, exist_ok=True)

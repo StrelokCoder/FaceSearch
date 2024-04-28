@@ -56,3 +56,14 @@ def GetCurrentWebBrowser():
     config = ConfigParser()
     config.read("config.ini")
     return config.get("main", "current_browser").lower()
+
+
+def IsHavingInstagramAccount():
+    config = ConfigParser()
+    config.read("config.ini")
+    have_account = config.get("main", "have_instagram_account")
+
+    if have_account.lower() == "true":
+        return True
+    elif have_account.lower() == "false":
+        return False

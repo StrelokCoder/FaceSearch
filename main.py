@@ -57,6 +57,7 @@ def ReverseSearchPhotos(face_analysis, database_sha256, save_encodings, download
             elif len(faces) == 0:
                 console.SubError("Couldn't find any faces on photo: {0}".format(photo_path))
             else:
+                frutils.DrawFacesInfo(faces, photo_path, Directories.PhotosMultiple + ntpath.basename(photo_path))
                 console.SubError("There is more than one face on photo: {0}, faces count: {1}".format(photo_path, len(faces)))
 
     if len(photos_info) == 0:
@@ -243,10 +244,10 @@ def InstagramSearchPhotos(face_analysis, database_sha256):
 
             utils.ClearDownloadsTemporary()
 
-        # os.remove(Directories.InstagramProfiles)
-        # with open(Directories.InstagramProfiles, "w") as file:
-        #    for saved_line in web_search_crash:
-        #        file.write(saved_line + "\n")
+        os.remove(Directories.InstagramProfiles)
+        with open(Directories.InstagramProfiles, "w") as file:
+            for saved_line in web_search_crash:
+                file.write(saved_line + "\n")
 
     driver.quit()
 
@@ -312,7 +313,7 @@ def main():
 
         if search_profiles:
             FacebookSearchPhotos(face_analysis, database_sha256)
-            # InstagramSearchPhotos(face_analysis, database_sha256)
+            InstagramSearchPhotos(face_analysis, database_sha256)
 
         if search_phrases:
             TextSearchPhotos(face_analysis, database_sha256)

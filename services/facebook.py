@@ -4,6 +4,8 @@
 import utils.webutils as webutils
 import utils.console as console
 
+import re
+
 from selenium.webdriver.common.by import By
 from time import sleep
 
@@ -21,9 +23,10 @@ class Facebook:
     # Appears every time you open profile on facebook to ask you to log in
     CLOSE_LOG_TO_FACEBOOK_XPATH = "/html/body/div[1]/div/div[1]/div/div[5]/div/div/div[1]/div/div[2]/div/div/div/div[1]/div"
 
-    # This image will be hold on seperate site, cause some people have a lot of photos and it's just faster to open them in new page and get download link from there
-    BETTER_QUALITY_IMAGE_SITE_SRC_CLASS = "x1i10hfl.xjbqb8w.x1ejq31n.xd10rxx.x1sy0etr.x17r0tee.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x1ypdohk.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x16tdsg8.x1hl2dhg.xggy1nq.x1a2a7pz.x1heor9g.xt0b8zv.x1lliihq.x5yr21d.x1n2onr6.xh8yej3"
-    BETTER_QUALITY_IMAGE_SRC_CLASS = "x85a59c.x193iq5w.x4fas0m.x19kjcj4"
+    # Better quality image stuff
+    BETTER_QUALITY_IMAGES_SITE_SRC_CLASS = "x1i10hfl.xjbqb8w.x1ejq31n.xd10rxx.x1sy0etr.x17r0tee.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x1ypdohk.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x16tdsg8.x1hl2dhg.xggy1nq.x1a2a7pz.x1heor9g.x1sur9pj.xkrqix3.x1lliihq.x5yr21d.x1n2onr6.xh8yej3"
+    BETTER_QUALITY_IMAGE_SRC_CLASS = "x1bwycvy.x193iq5w.x4fas0m.x19kjcj4"
+    BETTER_QUALITY_IMAGE_PREVIOUS_CLASS = "x14yjl9h.xudhj91.x18nykt9.xww2gxu.x6s0dn4.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x3nfvp2.xl56j7k.x1n2onr6.x1qhmfi1.xsdox4t.x1useyqa"
 
     def __init__(self):
         console.Task("Initialising facebook")
@@ -31,9 +34,9 @@ class Facebook:
     def Init(self, driver):
         driver.get(self.SITE_LINK)
 
-        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS, 10, False)
+        cookies_decline = webutils.LoopUntilElementFoundByClassName(driver, self.DECLINE_COOKIES_CLASS, 5, False)
         if cookies_decline is not None:
-            cookies_decline.click()
+            driver.execute_script("arguments[0].click();", cookies_decline)
 
         # We have to wait, so cookies decline will get remembered by facebook
         sleep(5)
@@ -66,65 +69,39 @@ class Facebook:
             console.SubError("Failed to init profile search at facebook")
             raise Exception()
 
-        images_info = []
+        images_url = []
 
-        loops = 0
-        previous_highest_image = 0
+        if len(driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGES_SITE_SRC_CLASS)) == 0:
+            return images_url
 
-        images_src_sites = []
+        # What thingy below does is basically reload first photo to get it's real post url
+        driver.execute_script("arguments[0].click();", driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGES_SITE_SRC_CLASS)[0])
+        sleep(2.5)
+        driver.execute_script("arguments[0].click();", driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_PREVIOUS_CLASS)[0])
+        sleep(5)
+        driver.execute_script("arguments[0].click();", driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_PREVIOUS_CLASS)[1])
+        sleep(2.5)
 
-        while loops < 100:
-            current_highest_image = 0
+        image_url = driver.find_element(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SRC_CLASS).get_attribute("src")
+        first_image_site_fbid = format(re.search("fbid=(.*)&set=", driver.current_url).group(1))
 
-            checks_for_loaded = 0
-            # Loop to check if new images loaded
+        # Scroll through images until you find first image of this person
+        while True:
+            images_url.append(image_url)
+
+            driver.execute_script("arguments[0].click();", driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_PREVIOUS_CLASS)[1])
+
             while True:
-                current_highest_image = len(driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SITE_SRC_CLASS))
+                try:
+                    new_image_url = driver.find_element(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SRC_CLASS).get_attribute("src")
+                    if image_url != new_image_url:
+                        image_url = new_image_url
+                        break
+                except:
+                    continue
+                continue
 
-                # This means, that all images were loaded
-                if current_highest_image != previous_highest_image or checks_for_loaded >= 50:
-                    break
-
-                checks_for_loaded += 1
-                sleep(0.1)
-
-            # Just an extra time to wait, cause it takes time before new images load
-            sleep(3)
-
-            if current_highest_image == previous_highest_image:
+            if first_image_site_fbid == format(re.search("fbid=(.*)&set=", driver.current_url).group(1)):
                 break
 
-            previous = previous_highest_image
-            images_preview_photos = driver.find_elements(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SITE_SRC_CLASS)
-
-            # Get links to sites with better quality image
-            while previous < current_highest_image:
-                images_src_sites.append(images_preview_photos[previous].get_attribute("href"))
-                previous += 1
-
-            # Open sites with better quality image
-            while previous_highest_image < current_highest_image:
-                # Open new window
-                driver.execute_script("window.open(" ");")
-                sleep(0.05)
-
-                # Switch to window and go to the link
-                driver.switch_to.window(driver.window_handles[len(driver.window_handles) - 1])
-                driver.get(images_src_sites[previous_highest_image])
-                previous_highest_image += 1
-                sleep(0.05)
-
-            # Now get images urls
-            while len(driver.window_handles) != 1:
-                driver.switch_to.window(driver.window_handles[len(driver.window_handles) - 1])
-                image_src = webutils.LoopUntilElementFoundByClassName(driver, self.BETTER_QUALITY_IMAGE_SRC_CLASS, 1)
-                if image_src is not None:
-                    images_info.append(driver.find_element(By.CLASS_NAME, self.BETTER_QUALITY_IMAGE_SRC_CLASS).get_attribute("src"))
-                driver.close()
-            driver.switch_to.window(driver.window_handles[0])
-
-            # Scroll down so more images will get loaded
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            loops += 1
-
-        return images_info
+        return images_url

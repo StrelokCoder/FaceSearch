@@ -198,9 +198,9 @@ def FacebookSearchPhotos(face_analysis, database_sha256):
             if webutils.DownloadUrls(array_urls_array, "No urls for facebook profile: {0}".format(line)) == False:
                 continue
 
-        frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
+            frutils.SaveEncodings(frutils.BatchFaceEncodings(face_analysis), database_sha256)
 
-        utils.ClearDownloadsTemporary()
+            utils.ClearDownloadsTemporary()
 
         os.remove(Directories.FacebookProfiles)
         with open(Directories.FacebookProfiles, "w") as file:

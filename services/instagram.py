@@ -55,6 +55,10 @@ class Instagram:
         # We have to wait, so cookies decline will get remembered
         sleep(5)
 
+        if config.IsHavingInstagramAccount():
+            console.SubTask("\nLog into your instagram account\n")
+            sleep(120)
+
         console.SubTask("Successfully initialized instagram")
         return True
 
@@ -67,10 +71,6 @@ class Instagram:
             driver.execute_script("arguments[0].click();", show_more_images)
 
         sleep(1)
-
-        if config.IsHavingInstagramAccount():
-            console.SubTask("\nLog into your instagram account\n")
-            sleep(120)
 
         return True
 
